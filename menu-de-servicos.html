@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu de apoio — seleção de mestrado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --stone: #EDEAE0;
+    --stone-deep: #E1DDCE;
+    --ink: #22322C;
+    --ink-soft: #4B594F;
+    --forest: #23433A;
+    --moss: #63765F;
+    --gold: #B8862E;
+    --gold-soft: #E9D9B4;
+    --line: #C9C3AF;
+    --card: #F7F5EE;
+    --radius: 14px;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--stone);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap{ max-width: 760px; margin: 0 auto; padding: 56px 24px 140px; }
+
+  .eyebrow{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--moss);
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{
+    content:""; width:22px; height:1px; background: var(--moss); display:inline-block;
+  }
+
+  h1{
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: clamp(32px, 5.5vw, 46px);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+    color: var(--forest);
+    margin: 14px 0 10px;
+  }
+  .lede{
+    font-size: 17px;
+    color: var(--ink-soft);
+    max-width: 56ch;
+    margin: 0 0 8px;
+  }
+  .lede em{ font-style: normal; color: var(--forest); font-weight: 600; }
+
+  header{ margin-bottom: 44px; padding-bottom: 32px; border-bottom: 1px solid var(--line); }
+
+  h2{
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 22px;
+    color: var(--forest);
+    margin: 0 0 4px;
+  }
+  .section-note{ color: var(--ink-soft); font-size: 14.5px; margin: 0 0 22px; max-width: 54ch; }
+  section{ margin-bottom: 52px; }
+
+  /* ---- Pacote fechado (signature block) ---- */
+  .package{
+    position: relative;
+    background: var(--forest);
+    color: var(--stone);
+    border-radius: var(--radius);
+    padding: 30px 30px 26px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color .15s ease;
+  }
+  .package.is-selected{ border-color: var(--gold); }
+  .package::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image: radial-gradient(circle at 85% -10%, rgba(184,134,46,0.25), transparent 55%);
+    pointer-events:none;
+  }
+  .package-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+  .package-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--gold-soft);
+    margin-bottom: 10px;
+  }
+  .package h3{
+    font-family:'Fraunces', serif; font-weight:500;
+    font-size: 25px; color: #fff; margin: 0 0 10px;
+  }
+  .package p.desc{ color: #D8DED6; font-size: 15px; max-width: 50ch; margin: 0 0 22px; }
+
+  .trail{ list-style:none; margin: 0 0 26px; padding:0; position: relative; }
+  .trail::before{
+    content:""; position:absolute; left:9px; top:8px; bottom:8px; width:1px;
+    background: rgba(255,255,255,0.22);
+  }
+  .trail li{
+    position: relative; padding-left: 32px; padding-bottom: 14px;
+    font-size: 14.5px; color: #E7EAE4;
+  }
+  .trail li:last-child{ padding-bottom: 0; }
+  .trail li::before{
+    content:""; position:absolute; left:3px; top:5px;
+    width:13px; height:13px; border-radius:50%;
+    background: var(--gold); border: 2px solid var(--forest);
+    box-shadow: 0 0 0 1px var(--gold);
+  }
+  .trail li strong{ color:#fff; font-weight:600; }
+
+  .package-price{
+    display:flex; align-items:baseline; justify-content:space-between;
+    flex-wrap: wrap; gap: 10px;
+    border-top: 1px solid rgba(255,255,255,0.18);
+    padding-top: 20px;
+  }
+  .price-value{ font-family:'IBM Plex Mono', monospace; font-size: 30px; color: var(--gold-soft); }
+  .price-note{ font-size: 13px; color:#B9C2B4; max-width: 30ch; text-align:right; }
+
+  /* checkbox pill, used on both package and services */
+  .check{
+    flex-shrink:0;
+    width: 24px; height:24px; border-radius:7px;
+    border: 2px solid rgba(255,255,255,0.5);
+    display:flex; align-items:center; justify-content:center;
+    background: transparent;
+  }
+  .check svg{ width:14px; height:14px; opacity:0; transition: opacity .12s ease; }
+  .package.is-selected .check{ background: var(--gold); border-color: var(--gold); }
+  .package.is-selected .check svg{ opacity:1; }
+
+  /* ---- Avulsos ---- */
+  .service{
+    display:flex; align-items:center; gap: 16px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: border-color .15s ease, opacity .15s ease;
+  }
+  .service.is-selected{ border-color: var(--forest); }
+  .service.is-disabled{ opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+  .service .check{
+    border-color: var(--line);
+  }
+  .service.is-selected .check{ background: var(--forest); border-color: var(--forest); }
+  .service.is-selected .check svg{ opacity:1; }
+  .service .check svg path{ stroke:#fff; }
+
+  .service-main{ flex:1; }
+  .service-main h4{
+    font-family:'Inter', sans-serif; font-weight:600; font-size:15.5px;
+    color: var(--forest); margin: 0 0 4px;
+  }
+  .service-main p{ font-size: 13.8px; color: var(--ink-soft); margin:0; }
+  .service-meta{
+    text-align:right; white-space:nowrap; display:flex; flex-direction:column; justify-content:center;
+  }
+  .service-price{ font-family:'IBM Plex Mono', monospace; font-size:17px; color: var(--forest); font-weight:500; }
+  .service-dur{ font-size: 12px; color: var(--moss); margin-top:2px; }
+
+  /* ---- Como funciona ---- */
+  .terms{
+    background: var(--stone-deep);
+    border-radius: var(--radius);
+    padding: 24px 26px;
+  }
+  .terms ul{ margin:0; padding-left: 18px; }
+  .terms li{ font-size: 14.5px; color: var(--ink-soft); margin-bottom: 9px; }
+  .terms li:last-child{ margin-bottom:0; }
+  .terms strong{ color: var(--ink); }
+
+  /* ---- Resumo / pedido ---- */
+  #summary{
+    background: var(--card);
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+    padding: 26px 28px;
+  }
+  #summary.empty .summary-list{ display:none; }
+  #summary.empty .summary-actions{ display:none; }
+  .summary-empty-msg{ font-size: 14.5px; color: var(--ink-soft); }
+  #summary.empty .summary-empty-msg{ display:block; }
+  #summary:not(.empty) .summary-empty-msg{ display:none; }
+
+  .summary-list{ margin: 4px 0 18px; }
+  .summary-row{
+    display:flex; justify-content:space-between; gap:12px;
+    font-size: 14.5px; padding: 9px 0; border-bottom: 1px solid var(--line);
+  }
+  .summary-row span:first-child{ color: var(--ink); }
+  .summary-row span:last-child{ font-family:'IBM Plex Mono', monospace; color: var(--forest); }
+  .summary-total{
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding-top: 14px; margin-bottom: 20px;
+  }
+  .summary-total span:first-child{ font-family:'Fraunces', serif; font-size:17px; color: var(--forest); }
+  .summary-total span:last-child{ font-family:'IBM Plex Mono', monospace; font-size:24px; color: var(--forest); font-weight:600; }
+
+  .summary-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+  .btn{
+    font-family:'Inter', sans-serif; font-weight:600; font-size: 13.5px;
+    padding: 11px 18px; border-radius: 8px; border: none; cursor:pointer;
+    transition: opacity .12s ease;
+  }
+  .btn:hover{ opacity:0.85; }
+  .btn-primary{ background: var(--forest); color: #fff; }
+  .btn-secondary{ background: transparent; color: var(--forest); border: 1.5px solid var(--forest); }
+  .btn-feedback{ font-size:12.5px; color: var(--moss); align-self:center; }
+
+  footer{
+    margin-top: 56px; padding-top: 26px; border-top: 1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between; flex-wrap: wrap; gap:12px;
+  }
+  footer p{ font-family:'Fraunces', serif; font-style:italic; font-size:15px; color: var(--moss); margin:0; }
+
+  /* ---- Barra flutuante de total ---- */
+  .float-bar{
+    position: fixed; left:0; right:0; bottom:0;
+    background: var(--forest); color:#fff;
+    padding: 14px 24px; display:flex; align-items:center; justify-content:space-between;
+    gap: 14px; box-shadow: 0 -6px 18px rgba(0,0,0,0.12);
+    transform: translateY(110%); transition: transform .22s ease;
+    z-index: 50;
+  }
+  .float-bar.show{ transform: translateY(0); }
+  .float-bar-label{ font-size:12.5px; color:#B9C2B4; font-family:'IBM Plex Mono', monospace; }
+  .float-bar-value{ font-family:'IBM Plex Mono', monospace; font-size:19px; font-weight:600; color: var(--gold-soft); }
+  .float-bar-cta{
+    background: var(--gold); color: var(--forest); border:none; border-radius:8px;
+    padding: 10px 16px; font-weight:600; font-size:13.5px; cursor:pointer; font-family:'Inter',sans-serif;
+  }
+
+  @media (max-width: 520px){
+    .wrap{ padding: 40px 18px 140px; }
+    .service{ flex-wrap: wrap; }
+    .service-meta{ text-align:left; flex-direction:row; gap:10px; align-items:baseline; margin-left: 40px; }
+    .package-price{ flex-direction: column; align-items:flex-start; }
+    .price-note{ text-align:left; }
+  }
+
+  @media print{
+    body{ background:#fff; }
+    header, section:not(#summary-section), .float-bar{ display:none !important; }
+    #summary-section{ margin:0; }
+    #summary{ border:none; padding:0; }
+    .summary-actions{ display:none !important; }
+    .print-header{ display:block !important; margin-bottom: 24px; }
+  }
+  .print-header{ display:none; }
+  .print-header h2{ font-size: 22px; }
+  .print-header p{ font-size: 13px; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Apoio para seleção de mestrado</div>
+    <h1>Um passo de cada vez,<br>com apoio no caminho</h1>
+    <p class="lede">Menu de serviços para acompanhar a preparação para o edital do PPGP/UFSC — da escolha da linha até a arguição. Marque o pacote completo <em>ou</em> os itens avulsos que fazem sentido pra você, e gere um resumo do que escolheu no final.</p>
+  </header>
+
+  <section>
+    <h2>Pacote fechado</h2>
+    <p class="section-note">Tudo incluso, do primeiro dilema até o dia da banca.</p>
+
+    <div class="package" id="pkg-block" data-name="Pacote fechado — Da decisão à arguição" data-price="1290">
+      <div class="package-top">
+        <div>
+          <div class="package-tag">Pacote fechado</div>
+          <h3>Da decisão à arguição</h3>
+        </div>
+        <div class="check" id="pkg-check">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="#23433A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <p class="desc">Acompanhamento contínuo em todas as etapas do processo seletivo.</p>
+
+      <ul class="trail">
+        <li><strong>Estruturação temática</strong> — transformar o tema solto em pergunta de pesquisa</li>
+        <li><strong>Decisão de linha</strong> — conversa guiada, sem pressa</li>
+        <li><strong>Currículo</strong> — organização de comprovantes para a Ficha de Pontuação</li>
+        <li><strong>Pré-projeto</strong> — leitura crítica em até 3 rodadas</li>
+        <li><strong>Anonimato</strong> — revisão de texto e metadados do PDF</li>
+        <li><strong>Arguição</strong> — simulado de banca de 30 minutos, com devolutiva</li>
+        <li><strong>Suporte contínuo</strong> — dúvidas pontuais por mensagem</li>
+      </ul>
+
+      <div class="package-price">
+        <span class="price-value">R$ 1.290</span>
+        <span class="price-note">à vista ou em 2x sem juros · economia frente à soma dos avulsos</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Serviços avulsos</h2>
+    <p class="section-note">Para quem já resolveu parte do caminho sozinha e quer reforço pontual em uma etapa específica. (Desmarca automaticamente se o pacote estiver selecionado.)</p>
+
+    <div class="service" data-name="Estruturação temática + roteiro personalizado" data-price="100" data-dur="1 entrega">
+      <div class="check"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="service-main">
+        <h4>Estruturação temática + roteiro personalizado</h4>
+        <p>Transformar um tema ainda solto em pergunta de pesquisa, com roteiro de seções, tutoriais e leituras sob medida.</p>
+      </div>
+      <div class="service-meta">
+        <span class="service-price">R$ 100</span>
+        <span class="service-dur">1 entrega</span>
+      </div>
+    </div>
+
+    <div class="service" data-name="Sessão de decisão de linha" data-price="150" data-dur="1 sessão · ~1h">
+      <div class="check"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="service-main">
+        <h4>Sessão de decisão de linha</h4>
+        <p>Conversa guiada para comparar as linhas possíveis a partir do que você já escreveu.</p>
+      </div>
+      <div class="service-meta">
+        <span class="service-price">R$ 150</span>
+        <span class="service-dur">1 sessão · ~1h</span>
+      </div>
+    </div>
+
+    <div class="service" data-name="Organização de currículo" data-price="250" data-dur="acompanhamento · ~2h">
+      <div class="check"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="service-main">
+        <h4>Organização de currículo</h4>
+        <p>Levantamento e organização de comprovantes para a Ficha de Pontuação (Lattes, certidões, produção).</p>
+      </div>
+      <div class="service-meta">
+        <span class="service-price">R$ 250</span>
+        <span class="service-dur">acompanhamento · ~2h</span>
+      </div>
+    </div>
+
+    <div class="service" data-name="Leitura crítica do pré-projeto" data-price="450" data-dur="até 3 rodadas">
+      <div class="check"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="service-main">
+        <h4>Leitura crítica do pré-projeto</h4>
+        <p>Leitura em voz alta com apontamentos de clareza — problema, objetivos e método.</p>
+      </div>
+      <div class="service-meta">
+        <span class="service-price">R$ 450</span>
+        <span class="service-dur">até 3 rodadas</span>
+      </div>
+    </div>
+
+    <div class="service" data-name="Revisão de anonimato" data-price="100" data-dur="1 revisão">
+      <div class="check"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="service-main">
+        <h4>Revisão de anonimato</h4>
+        <p>Checagem do texto, do nome do arquivo e dos metadados do PDF antes do envio.</p>
+      </div>
+      <div class="service-meta">
+        <span class="service-price">R$ 100</span>
+        <span class="service-dur">1 revisão</span>
+      </div>
+    </div>
+
+    <div class="service" data-name="Simulado de arguição" data-price="250" data-dur="1 sessão · ~1h">
+      <div class="check"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="service-main">
+        <h4>Simulado de arguição</h4>
+        <p>Banca simulada de até 30 minutos, com perguntas reais e devolutiva por escrito.</p>
+      </div>
+      <div class="service-meta">
+        <span class="service-price">R$ 250</span>
+        <span class="service-dur">1 sessão · ~1h</span>
+      </div>
+    </div>
+
+    <div class="service" data-name="Acompanhamento avulso (por hora)" data-price="150" data-dur="por hora">
+      <div class="check"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="service-main">
+        <h4>Acompanhamento avulso</h4>
+        <p>Hora de apoio pontual para dúvidas que não se encaixam nos serviços acima.</p>
+      </div>
+      <div class="service-meta">
+        <span class="service-price">R$ 150</span>
+        <span class="service-dur">por hora</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Como funciona</h2>
+    <div class="terms">
+      <ul>
+        <li><strong>Pagamento:</strong> à vista via Pix, ou em 2x sem juros no cartão. Serviços avulsos são pagos antes de cada sessão.</li>
+        <li><strong>Agendamento:</strong> sessões marcadas com pelo menos 48h de antecedência, sujeitas à disponibilidade de agenda até 14 de setembro.</li>
+        <li><strong>Prazo:</strong> por conta da janela curta do edital, recomenda-se contratar o pacote fechado até o final desta semana para garantir tempo de leitura e revisão com folga.</li>
+        <li><strong>Cancelamento:</strong> sessões podem ser remarcadas com 24h de aviso, sem custo adicional.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="summary-section">
+    <h2>Resumo do pedido</h2>
+    <p class="section-note">Marque acima o que faz sentido — o resumo é montado automaticamente aqui.</p>
+    <div id="summary" class="empty">
+      <div class="print-header">
+        <h2>Pedido de serviços — apoio para seleção PPGP/UFSC</h2>
+        <p id="print-date"></p>
+      </div>
+      <p class="summary-empty-msg">Nada selecionado ainda — marque o pacote ou os itens avulsos acima.</p>
+      <div class="summary-list" id="summary-list"></div>
+      <div class="summary-total">
+        <span>Total</span>
+        <span id="summary-total-value">R$ 0</span>
+      </div>
+      <div class="summary-actions">
+        <button class="btn btn-primary" id="btn-print">Salvar / imprimir PDF</button>
+        <button class="btn btn-secondary" id="btn-copy">Copiar resumo</button>
+        <span class="btn-feedback" id="copy-feedback"></span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>um passo de cada vez, com os pés no chão</p>
+  </footer>
+
+</div>
+
+<div class="float-bar" id="float-bar">
+  <div>
+    <div class="float-bar-label">Selecionado</div>
+    <div class="float-bar-value" id="float-total">R$ 0</div>
+  </div>
+  <button class="float-bar-cta" id="float-cta">Ver resumo</button>
+</div>
+
+<script>
+  const pkgBlock = document.getElementById('pkg-block');
+  const services = Array.from(document.querySelectorAll('.service'));
+  const summaryEl = document.getElementById('summary');
+  const summaryList = document.getElementById('summary-list');
+  const summaryTotalValue = document.getElementById('summary-total-value');
+  const floatBar = document.getElementById('float-bar');
+  const floatTotal = document.getElementById('float-total');
+
+  function fmt(n){
+    return 'R$ ' + n.toLocaleString('pt-BR');
+  }
+
+  function isPkgSelected(){ return pkgBlock.classList.contains('is-selected'); }
+
+  function render(){
+    let items = [];
+    if(isPkgSelected()){
+      items.push({ name: pkgBlock.dataset.name, price: Number(pkgBlock.dataset.price), dur: null });
+    } else {
+      services.forEach(s => {
+        if(s.classList.contains('is-selected')){
+          items.push({ name: s.dataset.name, price: Number(s.dataset.price), dur: s.dataset.dur });
+        }
+      });
+    }
+
+    const total = items.reduce((sum, i) => sum + i.price, 0);
+
+    if(items.length === 0){
+      summaryEl.classList.add('empty');
+      floatBar.classList.remove('show');
+    } else {
+      summaryEl.classList.remove('empty');
+      floatBar.classList.add('show');
+    }
+
+    summaryList.innerHTML = items.map(i =>
+      `<div class="summary-row"><span>${i.name}${i.dur ? ' <span style="color:var(--moss);font-size:12.5px">· '+i.dur+'</span>' : ''}</span><span>${fmt(i.price)}</span></div>`
+    ).join('');
+
+    summaryTotalValue.textContent = fmt(total);
+    floatTotal.textContent = fmt(total);
+
+    const d = new Date();
+    document.getElementById('print-date').textContent = 'Gerado em ' + d.toLocaleDateString('pt-BR');
+
+    window._currentItems = items;
+    window._currentTotal = total;
+  }
+
+  pkgBlock.addEventListener('click', () => {
+    const nowSelected = !isPkgSelected();
+    pkgBlock.classList.toggle('is-selected', nowSelected);
+    services.forEach(s => {
+      s.classList.toggle('is-disabled', nowSelected);
+      if(nowSelected) s.classList.remove('is-selected');
+    });
+    render();
+  });
+
+  services.forEach(s => {
+    s.addEventListener('click', () => {
+      if(s.classList.contains('is-disabled')) return;
+      s.classList.toggle('is-selected');
+      render();
+    });
+  });
+
+  document.getElementById('btn-print').addEventListener('click', () => window.print());
+
+  document.getElementById('btn-copy').addEventListener('click', async () => {
+    const items = window._currentItems || [];
+    const total = window._currentTotal || 0;
+    let text = 'Pedido de serviços — apoio para seleção PPGP/UFSC\n\n';
+    items.forEach(i => { text += `- ${i.name}${i.dur ? ' ('+i.dur+')' : ''}: ${fmt(i.price)}\n`; });
+    text += `\nTotal: ${fmt(total)}`;
+    try{
+      await navigator.clipboard.writeText(text);
+      const fb = document.getElementById('copy-feedback');
+      fb.textContent = 'copiado!';
+      setTimeout(() => fb.textContent = '', 2000);
+    }catch(e){
+      const fb = document.getElementById('copy-feedback');
+      fb.textContent = 'não foi possível copiar automaticamente';
+    }
+  });
+
+  document.getElementById('float-cta').addEventListener('click', () => {
+    document.getElementById('summary-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  render();
+</script>
+</body>
+</html>
